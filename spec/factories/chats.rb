@@ -1,7 +1,9 @@
+require 'faker'
+
 FactoryBot.define do
   factory :chat do
     number { 1 }
-    name { "MyString" }
+    name { Faker::Superhero.name }
     messages_count { 1 }
     application { nil }
   end

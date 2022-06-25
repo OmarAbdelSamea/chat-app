@@ -1,5 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Application, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+
+  # basic test
+  # one to many relation with Chat
+  it { should have_many(:chats).dependent(:destroy) }
+
+  it { should validate_presence_of(:name) }
 end
