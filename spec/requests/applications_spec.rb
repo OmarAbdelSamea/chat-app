@@ -54,7 +54,7 @@ RSpec.describe 'Application API', type: :request do
         before { get "/applications/#{application_token}" }
 
         context 'when the record exists' do
-            it 'returns the todo' do
+            it 'returns the application' do
                 expect(json).not_to be_empty
                 expect(json['token']).to eq(application_token)
             end
@@ -82,7 +82,7 @@ RSpec.describe 'Application API', type: :request do
         end
     end
 
-    # Test suite for DELETE /applications/:token
+    # Test for DELETE /applications/:token
     describe 'DELETE /applications/:token' do
         before { delete "/applications/#{application_token}" }
 

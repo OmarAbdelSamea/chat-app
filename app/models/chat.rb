@@ -1,4 +1,5 @@
 class Chat < ApplicationRecord
+  has_many :messages, dependent: :destroy
   belongs_to :application
   before_create :populate_scoped_number, :increment_chats_count
 

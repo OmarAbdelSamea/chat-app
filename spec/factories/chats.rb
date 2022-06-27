@@ -5,6 +5,6 @@ FactoryBot.define do
     number { 1 }
     name { Faker::Superhero.name }
     messages_count { 1 }
-    application { nil }
+    application { 0 }
   end
 end

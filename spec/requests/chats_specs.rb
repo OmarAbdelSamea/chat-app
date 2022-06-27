@@ -36,9 +36,9 @@ RSpec.describe 'Chat API', type: :request do
         before { get "/applications/#{application_token}/chats/#{chat_number}" }
 
         context 'when the record exists' do
-            it 'returns the todo' do
+            it 'returns the chat' do
                 expect(json).not_to be_empty
-                expect(json['token']).to eq(application_token)
+                expect(json['number']).to eq(chat_number)
             end
 
             it 'returns status code 200' do
@@ -47,7 +47,7 @@ RSpec.describe 'Chat API', type: :request do
         end
     end
 
-    # Test suite for DELETE /applications/:application_token/chats/:number
+    # Test for DELETE /applications/:application_token/chats/:number
     describe 'DELETE /applications/:application_token/chats/:number' do
         before { delete "/applications/#{application_token}/chats/#{chat_number}" }
 
