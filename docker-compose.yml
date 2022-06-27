@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+  db:
+    image: "mysql:5.7.38"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: root
+        - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - db:/var/run/mysqld
+    logging:
+            driver: none
+    ports:
+      - "33061:3306"
+  web:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    environment:
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      DB_NAME: chat_app_development
+      DB_PORT: 3306
+      DB_HOST: db
+      RAILS_ENV: development
+      RAILS_MAX_THREADS: 5
+      BUNDLE_PATH: /bundle
+    volumes:
+      - ../:/rails-app
+      - bundle:/bundle
+    ports:
+      - "3000:3000"
+    depends_on:
+      - "db"
+volumes:
+  db:
+  bundle:
