@@ -13,6 +13,12 @@ class MessagesController < ApplicationController
         json_response_messages(@chat.messages.last, :created)
     end
 
+    # POST /applications/:application_token/chats/:chat_number/messages/search 
+    def search
+        @search_result = Message.search params[:content]
+        json_response_messages_search(@search_result, :created)
+    end
+
     # GET /applications/:application_token/chats/:chat_number/messages/:number 
     def show
         json_response_messages(@message)

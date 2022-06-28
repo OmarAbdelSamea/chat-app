@@ -15,7 +15,7 @@ ENV RUBYOPT=-W:no-deprecated
 ENV APP_ROOT=/workspace
 RUN mkdir -p $APP_ROOT
 WORKDIR $APP_ROOT
-COPY . $APP_ROOT
+ADD . $APP_ROOT
 
 EXPOSE  3000
 CMD rm -f tmp/pids/server.pid && rails s -b '0.0.0.0'

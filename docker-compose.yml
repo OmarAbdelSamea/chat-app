@@ -16,6 +16,21 @@ services:
             driver: none
     ports:
       - "33061:3306"
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.1
+    environment:
+      - node.name=chat-app-node-1
+      - cluster.name=es-docker-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
   web:
     build: .
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
@@ -28,13 +43,16 @@ services:
       RAILS_ENV: development
       RAILS_MAX_THREADS: 5
       BUNDLE_PATH: /bundle
+      ELASTICSEARCH_URL: "http://elasticsearch:9200"
     volumes:
-      - ../:/rails-app
+      - ./:/workspace
       - bundle:/bundle
     ports:
       - "3000:3000"
     depends_on:
       - "db"
+      - "elasticsearch"
 volumes:
   db:
   bundle:
+  elasticsearch:
