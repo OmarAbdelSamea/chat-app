@@ -4,13 +4,13 @@ module Response
     end
 
     def json_response_chats(object, status = :ok)
-        render json: object, :except=> [:id, :application_id], \
+        render json: object, :only=> [:number, :messages_count], \
         :include => [:application => {:only=> [:token, :name, :created_at]}], \
         status: status 
     end
 
     def json_response_messages(object, status = :ok)
-        render json: object, :except=> [:id, :chat_id], \
+        render json: object, :only=> [:number, :content], \
         :include => [:chat => {:only=> [:number, :created_at]}], \
         status: status 
     end

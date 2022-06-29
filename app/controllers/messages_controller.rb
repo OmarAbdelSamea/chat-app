@@ -9,8 +9,9 @@ class MessagesController < ApplicationController
 
     # POST /applications/:application_token/chats/:chat_number/messages 
     def create
-        @chat.messages.create!(message_params)
-        json_response_messages(@chat.messages.last, :created)
+        @message = @chat.messages.new(number:get_scoped_number, content:params[:content])
+        CreateMessageJob.perform_later(@chat, message_params)
+        json_response_messages(@message, :created)
     end
 
     # POST /applications/:application_token/chats/:chat_number/messages/search 
@@ -26,7 +27,8 @@ class MessagesController < ApplicationController
 
     # PUT /applications/:application_token/chats/:chat_number/messages/:number
     def update
-        @message.update(message_params)
+        @message.content = params[:content]
+        UpdateMessageJob.perform_later(@message, message_params)
         json_response_messages(@message, :accepted)
     end
 
@@ -48,5 +50,9 @@ class MessagesController < ApplicationController
 
     def set_chat_message
         @message = @chat.messages.find_by_number!(params[:number]) if @chat
+    end
+
+    def get_scoped_number
+        @chat.messages.last.present? ? @chat.messages.last.number + 1 : 1
     end
 end

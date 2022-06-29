@@ -9,10 +9,7 @@ class Message < ApplicationRecord
   include Elasticsearch::Model::Callbacks
 
   def populate_scoped_number
-    if chat.messages.last.present?
-      self.number = chat.messages.last.number + 1     
-    else
-      self.number = 1
-    end
+    self.number = chat.messages.last.present? ? chat.messages.last.number + 1 : 1
   end
+
 end

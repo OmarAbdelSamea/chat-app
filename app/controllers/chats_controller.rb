@@ -9,8 +9,9 @@ class ChatsController < ApplicationController
 
     # POST /applications/:application_token/chats 
     def create
-        @application.chats.create!()
-        json_response_chats(@application.chats.last, :created)
+        @chat = @application.chats.new(number: get_scoped_number)
+        CreateChatJob.perform_later(@application)
+        json_response_chats(@chat, :created)
     end
 
     # GET /applications/:application_token/chats/:number
@@ -28,6 +29,10 @@ class ChatsController < ApplicationController
     
     def set_application
         @application = Application.find_by_token!(params[:application_token])
+    end
+
+    def get_scoped_number
+        @application.chats.last.present? ? @application.chats.last.number + 1 : 1
     end
 
     def set_application_chat

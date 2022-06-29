@@ -31,6 +31,35 @@ services:
       - elasticsearch:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
+  redis:
+    image: redis:7.0.2-bullseye
+    command: redis-server
+    volumes:
+      - redis:/data
+    ports:
+      - 6379
+    logging:
+            driver: none
+  sidekiq:
+    build: ./
+    command: bundle exec sidekiq
+    volumes:
+      - ./:/workspace
+    environment:
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      DB_NAME: chat_app_development
+      DB_PORT: 3306
+      DB_HOST: db
+      RAILS_ENV: development
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      ELASTICSEARCH_URL: "http://elasticsearch:9200"
+    depends_on:
+      - "db"
+      - "web"
+      - "redis"
+      - "elasticsearch"
   web:
     build: .
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
@@ -42,6 +71,8 @@ services:
       DB_HOST: db
       RAILS_ENV: development
       RAILS_MAX_THREADS: 5
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
       BUNDLE_PATH: /bundle
       ELASTICSEARCH_URL: "http://elasticsearch:9200"
     volumes:
@@ -52,7 +83,9 @@ services:
     depends_on:
       - "db"
       - "elasticsearch"
+      - "redis"
 volumes:
   db:
   bundle:
   elasticsearch:
+  redis:
