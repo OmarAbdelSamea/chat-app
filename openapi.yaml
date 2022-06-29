@@ -1,0 +1,322 @@
+swagger: "2.0"
+info:
+  description: "Instabug Backend Developer Challenge Chat System"
+  version: "1.0.0"
+  title: "Chat System"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "omarmohamed168@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+basePath: "/v2"
+tags:
+- name: "Application"
+- name: "Chat"
+- name: "Message"
+paths:
+  /applications:
+    get:
+      tags:
+      - "Application"
+      summary: "Get all application in the data store"
+      operationId: "getApp"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Application object that needs to be added to the store"
+        required: true
+        schema:
+          $ref: "#/definitions/Application"
+      responses:
+        "200":
+          description: "ok"
+    post:
+      tags:
+      - "Application"
+      summary: "add a new application in the data store"
+      operationId: "postApp"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Application object that needs to be added to the store"
+        required: true
+        schema:
+          $ref: "#/definitions/Application"
+      responses:
+        "201":
+          description: "created"
+  /application/:token:
+    get:
+      tags:
+      - "Application"
+      summary: "Finds an application by token"
+      operationId: "findApplicationByToken"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Application"
+        "404":
+          description: "Application not found"
+    put:
+      tags:
+      - "Application"
+      summary: "updates an application by token"
+      operationId: "updateApplicationByToken"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Name"
+        in: "query"
+        description: "new name of the application"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+          default: "available"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Application"
+        "400":
+          description: "Invalid name value"
+        "404":
+          description: "Application not found"
+    delete:
+      tags:
+      - "Application"
+      summary: "deletes an application by token"
+      operationId: "deleteApplicationByToken"
+      produces:
+      - "application/json"
+      responses:
+        "201":
+          description: "Application deleted successfully"
+        "404":
+          description: "Application not found"
+  /application/:application_token/chats:
+    get:
+      tags:
+      - "Chat"
+      summary: "Get all Chats in the data store"
+      operationId: "getChat"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Chat"
+        "404":
+          description: "Chat not found"
+    post:
+      tags:
+      - "Chat"
+      summary: "add a new chat in the data store"
+      operationId: "postChat"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Chat object"
+        required: true
+        schema:
+          $ref: "#/definitions/Chat"
+      responses:
+        "200":
+          description: "ok"
+  /application/:application_token/chats/:number:
+    get:
+      tags:
+      - "Chat"
+      summary: "Finds an chat by token"
+      operationId: "findChatByNumber"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Chat"
+        "404":
+          description: "Chat not found"
+    delete:
+      tags:
+      - "Chat"
+      summary: "deletes an chat by token"
+      operationId: "deleteChatByNumber"
+      produces:
+      - "application/json"
+      responses:
+        "201":
+          description: "Chat deleted successfully"
+        "404":
+          description: "Chat not found"
+  /application/:application_token/chats/:chats_number/messages:
+    get:
+      tags:
+      - "Message"
+      summary: "Get all Message in the data store"
+      operationId: "getMessages"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Message object that needs to be added to the db"
+        required: true
+        schema:
+          $ref: "#/definitions/Message"
+      responses:
+        "200":
+          description: "ok"
+    post:
+      tags:
+      - "Message"
+      summary: "add a new message in the data store"
+      description: ""
+      operationId: "postMessage"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Message object that needs to be added to the db"
+        required: true
+        schema:
+          $ref: "#/definitions/Message"
+      responses:
+        "201":
+          description: "created"
+  /application/:application_token/chats/:chats_number/messages/:number:
+    get:
+      tags:
+      - "Message"
+      summary: "Finds an Message by token"
+      operationId: "findMessageByToken"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "content"
+        in: "query"
+        description: "Message content"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Message"
+    put:
+      tags:
+      - "Message"
+      summary: "updates an Message by token"
+      operationId: "updateMessageByToken"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "content"
+        in: "query"
+        description: "new content of the message"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+          default: "available"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Message"
+        "400":
+          description: "Invalid content value"
+    delete:
+      tags:
+      - "Message"
+      summary: "deletes an Message by number"
+      operationId: "deleteMessageByNumber"
+      produces:
+      - "application/json"
+      responses:
+        "201":
+          description: "Message deleted successfully"
+        "404":
+          description: "Message not found"
+definitions:
+  Application:
+    type: "object"
+    required:
+    - "name"
+    - "photoUrls"
+    properties:
+      token:
+        type: "string"
+        example: "7tftdi4PJLqXhCmQtzcypqci"
+      name:
+        type: "string"
+        example: "Test Application"
+      chats_count:
+        type: "integer"
+      created_at:
+        type: "string"
+        example: "2022-06-29T12:22:03.000Z"
+      updated_at:
+        type: "string"
+        example: "2022-06-29T12:22:03.000Z"
+  Chat:
+    type: "object"
+    properties:
+      number:
+        type: "integer"
+        format: "int64"
+      messages_count:
+        type: "integer"
+        format: "int64"
+      application:
+        $ref: "#/definitions/Application"
+  Message:
+    type: "object"
+    properties:
+      number:
+        type: "integer"
+        format: "int64"
+      content:
+        type: "string"
+        format: "This is a content for a message"
+      Chat:
+        $ref: "#/definitions/Chat"
