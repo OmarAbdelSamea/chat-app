@@ -1,5 +1,6 @@
 class ApplicationsController < ApplicationController
     before_action :set_application, only: [:show, :update, :destroy]
+    before_action :application_params, only: [:create, :update]
 
     # GET /applications 
     def index
@@ -27,13 +28,19 @@ class ApplicationsController < ApplicationController
     # DELETE /applications/:token
     def destroy
         @application.destroy
-        head :no_content
+        render :json => { :result => "Application Deleted Succesfully" }, :status => :created 
     end
 
     private
     
     def application_params
-        params.permit(:name)
+        begin
+            params.require(:name)
+            params.permit(:name)
+        rescue => exception
+            render :json => { :error => exception.message }, :status => 400 
+            puts "Bad Request: #{exception.message}"
+        end
     end
     
     def set_application

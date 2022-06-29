@@ -1,6 +1,7 @@
 class MessagesController < ApplicationController
     before_action :set_chat
     before_action :set_chat_message, only: [:show, :update, :destroy]
+    before_action :message_params, only: [:create, :update, :search]
 
     # GET /applications/:application_token/chats/:chat_number/messages
     def index
@@ -35,13 +36,20 @@ class MessagesController < ApplicationController
     # DELETE /applications/:application_token/chats/:chat_number/messages/:number
     def destroy
         @message.destroy
-        json_response_messages(@message, :accepted)
+        render :json => { :result => "Message Deleted Succesfully" }, :status => :created 
     end
 
     private
 
     def message_params
-        params.permit(:content)
+        begin
+            params.require(:content)
+            params.permit(:content)
+        rescue => exception
+            render :json => { :error => exception.message }, :status => 400 
+            puts "Bad Request: #{exception.message}"
+        end
+        
     end
 
     def set_chat
@@ -53,6 +61,8 @@ class MessagesController < ApplicationController
     end
 
     def get_scoped_number
-        @chat.messages.last.present? ? @chat.messages.last.number + 1 : 1
+        @chat.with_lock do
+            @chat.messages_count + 1
+        end
     end
 end

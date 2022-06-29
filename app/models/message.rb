@@ -9,7 +9,6 @@ class Message < ApplicationRecord
   include Elasticsearch::Model::Callbacks
 
   def populate_scoped_number
-    self.number = chat.messages.last.present? ? chat.messages.last.number + 1 : 1
+    self.number = chat.messages_count + 1
   end
-
 end

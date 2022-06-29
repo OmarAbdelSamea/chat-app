@@ -4,6 +4,6 @@ class Chat < ApplicationRecord
   before_create :populate_scoped_number
 
   def populate_scoped_number
-    self.number = application.chats.last.present? ? application.chats.last.number + 1 : 1
+    self.number = application.chats_number + 1
   end
 end

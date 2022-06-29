@@ -21,8 +21,8 @@ class ChatsController < ApplicationController
 
     # DELETE /applications/:application_token/chats/:number
     def destroy
-        @chat.destroy
-        head :no_content
+        @chat.destroy!
+        render :json => { :result => "Chat Deleted Succesfully" }, :status => :created 
     end
 
     private
@@ -32,7 +32,9 @@ class ChatsController < ApplicationController
     end
 
     def get_scoped_number
-        @application.chats.last.present? ? @application.chats.last.number + 1 : 1
+        @application.with_lock do
+            @application.chats_count + 1
+        end
     end
 
     def set_application_chat
