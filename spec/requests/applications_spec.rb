@@ -38,13 +38,13 @@ RSpec.describe 'Application API', type: :request do
         context 'invalid request' do
             before { post '/applications', params: { invalid_title: 'Invalid Name'}}
 
-            it 'returns status code 422' do
-                expect(response).to have_http_status(422)
+            it 'returns status code 400' do
+                expect(response).to have_http_status(400)
             end
         
             it 'returns a validation failure message' do
                 expect(response.body)
-                .to match(/Validation failed: Name can't be blank/)
+                .to match(/param is missing or the value is empty: name/)
             end
         end
     end
@@ -87,7 +87,7 @@ RSpec.describe 'Application API', type: :request do
         before { delete "/applications/#{application_token}" }
 
         it 'returns status code 204' do
-        expect(response).to have_http_status(204)
+        expect(response).to have_http_status(201)
         end
     end
 end

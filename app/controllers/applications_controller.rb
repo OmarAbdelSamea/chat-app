@@ -39,7 +39,6 @@ class ApplicationsController < ApplicationController
             params.permit(:name)
         rescue => exception
             render :json => { :error => exception.message }, :status => 400 
-            puts "Bad Request: #{exception.message}"
         end
     end
     

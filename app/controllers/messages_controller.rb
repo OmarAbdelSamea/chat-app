@@ -10,9 +10,15 @@ class MessagesController < ApplicationController
 
     # POST /applications/:application_token/chats/:chat_number/messages 
     def create
-        @message = @chat.messages.new(number:get_scoped_number, content:params[:content])
-        CreateMessageJob.perform_later(@chat, message_params, get_scoped_number)
-        json_response_messages(@message, :created)
+        @count, @lock_result = get_scoped_number
+        puts "Count: #{@count}, Lock Result: #{@lock_result}"
+        if @lock_result != false
+            @message = @chat.messages.new(number:@count, content:params[:content])
+            CreateMessageJob.perform_later(@chat, params[:content], @count)
+            json_response_messages(@message, :created)
+        else
+            render :json => { :error => "Chat not created, Please try again later" }, :status => 400        
+        end
     end
 
     # POST /applications/:application_token/chats/:chat_number/messages/search 
@@ -47,7 +53,6 @@ class MessagesController < ApplicationController
             params.permit(:content)
         rescue => exception
             render :json => { :error => exception.message }, :status => 400 
-            puts "Bad Request: #{exception.message}"
         end
         
     end
@@ -60,16 +65,31 @@ class MessagesController < ApplicationController
         @message = @chat.messages.find_by_number!(params[:number]) if @chat
     end
 
+    def increment_messages_count(messages_count)
+        $redis.set("application_token:#{@chat.application.token}/chat_number:#{@chat.number}/messages_count", messages_count)
+    end
+
     def get_scoped_number
-        @chat.with_lock do
+        @lock_result = $red_lock.lock("application_token:#{@chat.application.token}/chat_number:#{@chat.number}/messages_count", 3000)
+        if @lock_result != false
             if $redis.get("application_token:#{@chat.application.token}/chat_number:#{@chat.number}/messages_count").present?
                 puts "Key found in redis"
-                $redis.get("application_token:#{@chat.application.token}/chat_number:#{@chat.number}/messages_count").to_i + 1
+                @count = $redis.get("application_token:#{@chat.application.token}/chat_number:#{@chat.number}/messages_count").to_i + 1
+                increment_messages_count(@count)
             else
-                $redis.set("application_token:#{@chat.application.token}/chat_number:#{@chat.number}/messages_count", @chat.messages_count)
+                @count = @chat.messages_count + 1
                 puts "Key not found in redis"
-                @chat.messages_count + 1
+                $redis.set("application_token:#{@chat.application.token}/chat_number:#{@chat.number}/messages_count", @count)
             end
+            sleep 2
+            puts "Chat count incremented in Redis #{$redis.get("application_token:#{@chat.application.token}/chat_number:#{@chat.number}/messages_count").to_i}"
+            $red_lock.unlock(@lock_result)
+
+            return @count, @lock_result
+        else
+            puts "resource not availble"
+            return 0, false
         end
     end
+
 end

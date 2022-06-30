@@ -7,15 +7,8 @@ class CreateMessageJob < ApplicationJob
     message_number = args[2]
     chat.with_lock do
       # sleep 2 for testing purposes
-      chat.messages.create!(message_params)
+      chat.messages.create!(number: message_number, content: message_params)
       puts "Message saved to db #{chat.messages.last}"
-  
-      increment_messages_count(chat, message_number)
-      puts "Message count incremented in Redis#{message_number}"
     end
-  end
-
-  def increment_messages_count(chat, messages_count)
-    $redis.set("application_token:#{chat.application.token}/chat_number:#{chat.number}/messages_count", messages_count)
   end
 end
