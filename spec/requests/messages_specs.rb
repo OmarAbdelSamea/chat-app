@@ -8,7 +8,7 @@ RSpec.describe 'Chat API', type: :request do
     let!(:application_token) {message.chats.first.application.token}
 
     # Test for GET /applications/:application_token/chats/:chat_number/messages
-    describe 'GET /applications/:application_token/chats' do
+    describe 'GET /applications/:application_token/chats/:chat_number/messages' do
         before { get "/applications/#{application_token}/chats/#{chat_number}/messages" }
 
         it 'returns applications' do
@@ -22,7 +22,7 @@ RSpec.describe 'Chat API', type: :request do
     end
 
     # Test for POST /applications/:application_token/chats/:chat_number/messages
-    describe 'POST /applications/:application_token/chats' do
+    describe 'POST /applications/:application_token/chats/:chat_number/messages' do
         context 'valid request' do          
             before { post "/applications/#{application_token}/chats/#{chat_number}/messages" }
 
@@ -33,7 +33,7 @@ RSpec.describe 'Chat API', type: :request do
     end
 
     # Test for GET /applications/:application_token/chats/:chat_number/messages/:number
-    describe 'GET /applications/:application_token/chats/:token' do
+    describe 'GET /applications/:application_token/chats/:chat_number/messages/:number' do
         before { get "/applications/#{application_token}/chats/#{chat_number}/messages/#{message_number}" }
 
         context 'when the record exists' do
@@ -49,18 +49,19 @@ RSpec.describe 'Chat API', type: :request do
     end
 
     # Test for PUT /applications/:application_token/chats/:chat_number/messages/:number
-    describe 'PUT /applications/:token' do
+    describe 'PUT /applications/:application_token/chats/:chat_number/messages/:number' do
         let(:valid_attributes) { { content: 'New Content for the message' } }
 
         context 'when the record exists' do
             before { put "/applications/#{application_token}/chats/#{chat_number}/messages/#{message_number}", params: valid_attributes }
 
             it 'updates the record' do
-                expect(response.body).to be_empty
+                expect(json).not_to be_empty
+                expect(json['name']).to eq("New Content for the message")
             end
 
-            it 'returns status code 204' do
-                expect(response).to have_http_status(204)
+            it 'returns status code 201' do
+                expect(response).to have_http_status(201)
             end
         end
     end
@@ -69,8 +70,8 @@ RSpec.describe 'Chat API', type: :request do
     describe 'DELETE /applications/:application_token/chats/:number' do
         before { delete "/applications/#{application_token}/chats/#{chat_number}/messages/#{message_number}" }
 
-        it 'returns status code 202' do
-        expect(response).to have_http_status(202)
+        it 'returns status code 201' do
+            expect(response).to have_http_status(201)
         end
     end
 end

@@ -73,11 +73,12 @@ RSpec.describe 'Application API', type: :request do
             before { put "/applications/#{application_token}", params: valid_attributes }
 
             it 'updates the record' do
-                expect(response.body).to be_empty
+                expect(json).not_to be_empty
+                expect(json['name']).to eq("UpdateName")
             end
 
-            it 'returns status code 204' do
-                expect(response).to have_http_status(204)
+            it 'returns status code 201' do
+                expect(response).to have_http_status(201)
             end
         end
     end

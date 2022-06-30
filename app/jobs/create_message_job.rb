@@ -5,10 +5,8 @@ class CreateMessageJob < ApplicationJob
     chat = args[0]
     message_params = args[1]
     message_number = args[2]
-    chat.with_lock do
-      # sleep 2 for testing purposes
-      chat.messages.create!(number: message_number, content: message_params)
-      puts "Message saved to db #{chat.messages.last}"
-    end
+    # sleep 2 for testing purposes
+    chat.messages.create!(number: message_number, content: message_params)
+    puts "Message saved to db #{chat.messages.last}"
   end
 end

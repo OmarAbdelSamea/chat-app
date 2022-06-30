@@ -81,7 +81,6 @@ class MessagesController < ApplicationController
                 puts "Key not found in redis"
                 $redis.set("application_token:#{@chat.application.token}/chat_number:#{@chat.number}/messages_count", @count)
             end
-            sleep 2
             puts "Chat count incremented in Redis #{$redis.get("application_token:#{@chat.application.token}/chat_number:#{@chat.number}/messages_count").to_i}"
             $red_lock.unlock(@lock_result)
 

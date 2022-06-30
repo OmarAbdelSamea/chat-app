@@ -21,8 +21,10 @@ class ApplicationsController < ApplicationController
 
     # PUT /applications/:token
     def update
-        @application.update(application_params)
-        head :no_content
+        @application.with_lock do
+            @application.update(application_params)
+        end
+        json_response(@application, :created)
     end
 
     # DELETE /applications/:token
