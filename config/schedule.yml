@@ -1,0 +1,5 @@
+save_counts_persistent:
+  cron: "* * * * *" # this runs the job every minute for demo
+  # cron "0 * * * *" this runs the job every hour
+  class: "SaveCountsPersistentJob"
+  queue: default

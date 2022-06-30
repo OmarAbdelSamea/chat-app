@@ -9,6 +9,11 @@ class Message < ApplicationRecord
   include Elasticsearch::Model::Callbacks
 
   def populate_scoped_number
-    self.number = chat.messages_count + 1
+    if $redis.get("application_token:#{chat.application.token}/chat_number:#{chat.number}/messages_count").present?
+      self.number = $redis.get("application_token:#{chat.application.token}/chat_number:#{chat.number}/messages_count").to_i + 1
+    else
+      $redis.set("application_token:#{chat.application.token}/chat_number:#{chat.number}/messages_count", chat.messages_count)
+      self.number = chat.messages_count + 1
+    end
   end
 end

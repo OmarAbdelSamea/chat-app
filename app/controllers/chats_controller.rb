@@ -10,7 +10,7 @@ class ChatsController < ApplicationController
     # POST /applications/:application_token/chats 
     def create
         @chat = @application.chats.new(number: get_scoped_number)
-        CreateChatJob.perform_later(@application)
+        CreateChatJob.perform_later(@application, get_scoped_number)
         json_response_chats(@chat, :created)
     end
 
@@ -33,7 +33,14 @@ class ChatsController < ApplicationController
 
     def get_scoped_number
         @application.with_lock do
-            @application.chats_count + 1
+            if $redis.get("application_token:#{@application.token}/chats_count").present?
+                puts "Key found in redis"
+                $redis.get("application_token:#{@application.token}/chats_count").to_i + 1
+            else
+                $redis.set("application_token:#{@application.token}/chats_count", @application.chats_count)
+                puts "Key not found in redis"
+                @application.chats_count + 1
+            end
         end
     end
 

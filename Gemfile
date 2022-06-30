@@ -29,8 +29,10 @@ gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
 
 gem 'sidekiq'
+gem "sidekiq-cron"
 
 gem 'redis', '~> 4.0'
+
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem 'rack-cors'
