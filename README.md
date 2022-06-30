@@ -340,4 +340,4 @@ class SaveCountsPersistentJob < ApplicationJob
 end
 ```
 ## 16. Writing RESTful API compliant to openapi standard
-[Openapi.yml](https://github.com/OmarAbdelSamea/chat-app/blob/master/openapi.yml)
+[Openapi.yaml](https://github.com/OmarAbdelSamea/chat-app/blob/master/openapi.yml)
