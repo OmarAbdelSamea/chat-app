@@ -1,9 +1,5 @@
 
 <div align="center">
-  <a href="https://github.com/OmarAbdelSamea/chat-app">
-    <img src="https://user-images.githubusercontent.com/57943026/176397974-cd9cc993-d599-4eeb-9e7e-852960bf7490.png" alt="Logo" width="80" height="80">
-  </a>
-
 <h3 align="center">Rails Chat System</h3>
 
 
