@@ -33,16 +33,16 @@
 </ol>
 
 <!-- ABOUT THE PROJECT -->
-# About The Project:
+# About The Project
 Chat system that allows creating new applications, chats and messages the applications supports running on multiple servers in parallel by processing requests concurrently using queues and locks.
 
 ## Demo
 https://user-images.githubusercontent.com/57943026/176784778-b103703b-268b-4935-91fe-ce156db4885f.mp4
 
-## Architecture:
+## Architecture
 ![image](https://user-images.githubusercontent.com/57943026/176658099-9c6403ac-f963-4a3e-ad40-bca3551e2bca.png)
 
-## Models:
+## Models
 ![image](https://user-images.githubusercontent.com/57943026/176662512-f0ad67ac-3466-4c9e-a58b-fe011b31414e.png)
 
 ## Technologies
