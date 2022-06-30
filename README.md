@@ -19,10 +19,10 @@
       <li><a href="#models">Models</a></li>
     </ul>
     <ul>
-      <li><a href="#endpoints">Endpoints</a></li>
+      <li><a href="#technologies">Technologies</a></li>
     </ul>
     <ul>
-      <li><a href="#technologies">Technologies</a></li>
+      <li><a href="#endpoints">Endpoints</a></li>
     </ul>
   </li>
   <li>
