@@ -10,10 +10,10 @@
   <li>
     <a href="#about-the-project">About the Project</a>
     <ul>
-      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#demo">Demo</a></li>
     </ul>
     <ul>
-      <li><a href="#demo">Demo</a></li>
+      <li><a href="#architecture">Architecture</a></li>
     </ul>
     <ul>
       <li><a href="#models">Models</a></li>
@@ -271,7 +271,7 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
   end
   ```
 ## 11.  Containerization of Sidekiq and Redis
-## 12. Saving chats_count and messages_count in Redis instead of MySQL with each new record for higher performance 
+## 12. Saving `chats_count` and `messages_count` in Redis instead of MySQL with each new record for higher performance 
 
 ## 13. Adding pessimistic lock for Redis (redlock gem) to avoid race conditions while updating chats/messages count
 
