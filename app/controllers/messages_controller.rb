@@ -41,7 +41,13 @@ class MessagesController < ApplicationController
 
     # DELETE /applications/:application_token/chats/:chat_number/messages/:number
     def destroy
-        @message.destroy
+        @lock_result = $red_lock.lock("application_token:#{@chat.application.token}/chat_number:#{@chat.number}/messages_count", 3000)
+        if @lock_result != false
+            @count = $redis.get("application_token:#{@chat.application.token}/chat_number:#{@chat.number}/messages_count").to_i - 1
+            update_messages_count(@count)
+            $red_lock.unlock(@lock_result)
+        end
+        @message.destroy!
         render :json => { :result => "Message Deleted Succesfully" }, :status => :created 
     end
 
@@ -65,7 +71,7 @@ class MessagesController < ApplicationController
         @message = @chat.messages.find_by_number!(params[:number]) if @chat
     end
 
-    def increment_messages_count(messages_count)
+    def update_messages_count(messages_count)
         $redis.set("application_token:#{@chat.application.token}/chat_number:#{@chat.number}/messages_count", messages_count)
     end
 
@@ -75,7 +81,7 @@ class MessagesController < ApplicationController
             if $redis.get("application_token:#{@chat.application.token}/chat_number:#{@chat.number}/messages_count").present?
                 puts "Key found in redis"
                 @count = $redis.get("application_token:#{@chat.application.token}/chat_number:#{@chat.number}/messages_count").to_i + 1
-                increment_messages_count(@count)
+                update_messages_count(@count)
             else
                 @count = @chat.messages_count + 1
                 puts "Key not found in redis"
