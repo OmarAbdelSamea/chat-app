@@ -222,12 +222,13 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
 ## 9.  Containerization of elasticsearch
 
 ## 10. Handling of parallel processing and distribution by using queues
-      1. Analyzing options
-        - Sidekiq
-        - RabbitMQ
-        - Kafka
-      2. Selecting the one of the options -> Sidekiq 
-      3. Selecting an appropriate storage for workers -> Redis (Sidekiq default)
+  1. Analyzing options
+    - Sidekiq
+    - RabbitMQ
+    - Kafka
+  2. Selecting the one of the options -> Sidekiq 
+  3. Selecting an appropriate storage for workers -> Redis (Sidekiq default)
+
   ```ruby
   class CreateChatJob < ApplicationJob
     queue_as :default
