@@ -115,7 +115,7 @@ https://user-images.githubusercontent.com/57943026/176784778-b103703b-268b-4935-
 ```bash
 1. docker-compose run web bundle install
 2. docker-compose run web rails db:setup
-3. docker-compose up --build
+3. docker-compose up
 ```
 
 # Development Process
