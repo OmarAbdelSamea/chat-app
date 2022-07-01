@@ -119,14 +119,14 @@ https://user-images.githubusercontent.com/57943026/176784778-b103703b-268b-4935-
 ```
 
 # Development Process
-## 1. Extracting Models from requirements:
+### 1. Extracting Models from requirements:
   - Application
   - Chat
   - Message
-## 2. Identifying relationships between models
+### 2. Identifying relationships between models
   - Application has many chats -> one to many relationship
   - Chat has many messages -> one to many relationship
-## 3. Creating Migrations with the appropriate indices and constraints.
+### 3. Creating Migrations with the appropriate indices and constraints.
   - number index in `Chat` and `Message` is scoped to the super class so it can't be unique.
   - for application token `ActiveRecord::SecureToken::ClassMethods` is used in Application model to generate a unique 24 byte unique token.
 ```ruby
@@ -169,17 +169,17 @@ class CreateMessages < ActiveRecord::Migration[5.2]
 end
 ```
 
-## 4. Writing unit tests (specs) for Test Driven Development approach
+### 4. Writing unit tests (specs) for Test Driven Development approach
   - [Applications Spec](https://github.com/OmarAbdelSamea/chat-app/blob/master/spec/requests/applications_spec.rb)
   - [Chats Spec](https://github.com/OmarAbdelSamea/chat-app/blob/master/spec/requests/chats_specs.rb)
   - [Messages Spec](https://github.com/OmarAbdelSamea/chat-app/blob/master/spec/requests/messages_specs.rb)
 
-## 5. Writing RESTful endpoints in controllers which pass all tests
+### 5. Writing RESTful endpoints in controllers which pass all tests
   - [Applications Controller](https://github.com/OmarAbdelSamea/chat-app/blob/master/app/controllers/applications_controller.rb)
   - [Chats Controller](https://github.com/OmarAbdelSamea/chat-app/blob/master/app/controllers/chats_controller.rb)
   - [Messages Controller](https://github.com/OmarAbdelSamea/chat-app/blob/master/app/controllers/messages_controller.rb)
 
-## 6. Check tests if it fails repeat cycle until all tests pass
+### 6. Check tests if it fails repeat cycle until all tests pass
   
 ```ruby
 .................
@@ -189,11 +189,11 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
 
 ```
 
-## 7. After Getting familiar with Ruby on Rails, started containerization process of Rails app and MySQL Database
+### 7. After Getting familiar with Ruby on Rails, started containerization process of Rails app and MySQL Database
   - [Dockerfile](https://github.com/OmarAbdelSamea/chat-app/blob/master/Dockerfile)
   - [Docker-compose](https://github.com/OmarAbdelSamea/chat-app/blob/master/docker-compose.yml)
 
-## 8. Adding search endpoint for messages using `elastic search`
+### 8. Adding search endpoint for messages using `elastic search`
   - Adding `ElasticSearch` in Message model
   - Creating search endpoint in Messages controller
   - Response: search string: `Github`
@@ -220,9 +220,25 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
   ]
   ```
 
-## 9.  Containerization of elasticsearch
-
-## 10. Handling parallel processing and system distribution by using queues
+### 9.  Containerization of elasticsearch
+```yaml
+elasticsearch:
+  image: docker.elastic.co/elasticsearch/elasticsearch:7.8.1
+  environment:
+    - node.name=chat-app-node-1
+    - cluster.name=es-docker-cluster
+    - discovery.type=single-node
+    - bootstrap.memory_lock=true
+  ulimits:
+    memlock:
+      soft: -1
+      hard: -1
+  volumes:
+    - elasticsearch:/usr/share/elasticsearch/data
+  ports:
+    - 9200:9200
+```
+### 10. Handling parallel processing and system distribution by using queues
   1. Analyzing options
     - Sidekiq
     - RabbitMQ
@@ -269,10 +285,42 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
     end
   end
   ```
-## 11.  Containerization of Sidekiq and Redis
-## 12. Saving `chats_count` and `messages_count` in Redis instead of MySQL with each new record for higher performance 
+### 11.  Containerization of Sidekiq and Redis
+```yaml
+redis:
+  image: redis:7.0.2-bullseye
+  command: redis-server
+  volumes:
+    - redis:/data
+  ports:
+    - 6379
+  logging:
+          driver: none
+sidekiq:
+  build: ./
+  command: bundle exec sidekiq
+  volumes:
+    - ./:/workspace
+  environment:
+    DB_USERNAME: root
+    DB_PASSWORD: root
+    DB_NAME: chat_app_development
+    DB_PORT: 3306
+    DB_HOST: db
+    RAILS_ENV: development
+    REDIS_HOST: redis
+    REDIS_PORT: 6379
+    ELASTICSEARCH_URL: "http://elasticsearch:9200"
+  depends_on:
+    - "db"
+    - "web"
+    - "redis"
+    - "elasticsearch"
+```
+### 12. Saving queries by using Redis
+   - Saving `chats_count` and `messages_count` in Redis instead of MySQL with each new record for higher performance 
 
-## 13. Adding pessimistic locks for Redis (redlock gem) to avoid race conditions while updating `chats_count` and `messages_count`
+### 13. Adding pessimistic locks for Redis (redlock gem) to avoid race conditions while updating `chats_count` and `messages_count`
   - Example from chats controller, same approach implemented in messages controller
   ```ruby
   # lock the chat number in redis before incrementing the count
@@ -298,7 +346,7 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
   end
   ```
 
-## 14. Adding pessimistic lock for MySQL to avoid race conditions while updating applications/chats/messages
+### 14. Adding pessimistic lock for MySQL to avoid race conditions while updating applications/chats/messages
   ```ruby 
   def perform(*args)
     message = args[0]
@@ -309,7 +357,7 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
     end
   end
   ```
-## 15. Adding Cron Job to update `chats_count` and `messages_count` in MySQL from Redis
+### 15. Adding Cron Job to update `chats_count` and `messages_count` in MySQL from Redis
 ```ruby
 save_counts_persistent:
   cron: "* * * * *" # this runs the job every minute for demos
@@ -345,5 +393,5 @@ class SaveCountsPersistentJob < ApplicationJob
   end
 end
 ```
-## 16. Writing RESTful API compliant to openapi standard
+### 16. Writing RESTful API compliant to openapi standard
 [openapi.yaml](https://github.com/OmarAbdelSamea/chat-app/blob/master/openapi.yaml)
