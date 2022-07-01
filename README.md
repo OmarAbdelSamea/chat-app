@@ -128,6 +128,7 @@ https://user-images.githubusercontent.com/57943026/176784778-b103703b-268b-4935-
   - Chat has many messages -> one to many relationship
 ## 3. Creating Migrations with the appropriate indices and constraints.
   - number index in `Chat` and `Message` is scoped to the super class so it can't be unique.
+  - for application token `ActiveRecord::SecureToken::ClassMethods` is used in Application model to generate a unique 24 byte unique token.
 ```ruby
 class CreateApplications < ActiveRecord::Migration[5.2]
   def change
