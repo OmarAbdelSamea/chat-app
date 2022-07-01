@@ -21,6 +21,7 @@ class ApplicationsController < ApplicationController
 
     # PUT /applications/:token
     def update
+        # lock the row in MySQL until the record is updated
         @application.with_lock do
             @application.update(application_params)
         end
@@ -35,6 +36,7 @@ class ApplicationsController < ApplicationController
 
     private
     
+    # gets the application params from the request
     def application_params
         begin
             params.require(:name)
@@ -44,6 +46,7 @@ class ApplicationsController < ApplicationController
         end
     end
     
+    # get the application specified in the query params
     def set_application
         @application = Application.find_by_token!(params[:token])
     end

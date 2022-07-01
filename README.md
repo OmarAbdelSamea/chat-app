@@ -238,7 +238,6 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
       chat_number = args[1]
       # sleep 2 # for testing purposes
       application.chats.create!(number: chat_number)
-      puts "Chat saved to db #{application.chats.last}"
     end
   end
   ```
@@ -252,7 +251,6 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
       message_number = args[2]
       # sleep 2 for testing purposes
       chat.messages.create!(number: message_number, content: message_params)
-      puts "Message saved to db #{chat.messages.last}"
     end
   end
   ```
@@ -263,9 +261,9 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
     def perform(*args)
       message = args[0]
       message_params = args[1]
+      # pessimistic locking in MySQL database until the record is updated
       message.with_lock do
         message.update!(message_params)
-        puts "Message updated in db #{message.content}"
       end
     end
   end
@@ -279,21 +277,16 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
   @lock_result = $red_lock.lock("application_token:#{@application.token}/chats_count", 2000)
   if @lock_result != false
       if $redis.get("application_token:#{@application.token}/chats_count").present?
-          puts "Key found in redis"
           @count = $redis.get("application_token:#{@application.token}/chats_count").to_i + 1
           increment_chats_count(@count)
       else
           @count = @application.chats_count + 1
-          puts "Key not found in redis"
           $redis.set("application_token:#{@application.token}/chats_count", @count)
       end
 
-      puts "Chat count incremented in Redis #{$redis.get("application_token:#{@application.token}/chats_count").to_i}"
       $red_lock.unlock(@lock_result)
-
       return @count, @lock_result
   else
-      puts "resource not available"
       return 0, false
   end
   ```
@@ -305,7 +298,6 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
     message_params = args[1]
     message.with_lock do
       message.update!(message_params)
-      puts "Message updated in db #{message.content}"
     end
   end
   ```
@@ -313,7 +305,7 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
 ```ruby
 save_counts_persistent:
   cron: "* * * * *" # this runs the job every minute for demo
-  # cron "0 * * * *" this runs the job every hour
+  # cron: "0 * * * *" this runs the job every hour
   class: "SaveCountsPersistentJob"
   queue: default
 ```
