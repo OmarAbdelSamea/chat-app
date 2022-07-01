@@ -2,6 +2,7 @@ class SaveCountsPersistentJob < ApplicationJob
   queue_as :default
 
   def perform(*args)
+    
     # get all applications in MySQL database
     Application.find_each do |application|
       # check if present in redis or not

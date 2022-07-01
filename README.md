@@ -68,7 +68,7 @@ https://user-images.githubusercontent.com/57943026/176784778-b103703b-268b-4935-
 ```json
   {
     "token": "7tftdi4PJLqXhCmQtzcypqci",
-    "name": "Test Application",
+    "name": "This is name of the application",
     "chats_count": 0,
     "created_at": "2022-06-29T12:22:03.000Z",
     "updated_at": "2022-06-29T12:22:03.000Z"
@@ -85,7 +85,7 @@ https://user-images.githubusercontent.com/57943026/176784778-b103703b-268b-4935-
     "messages_count": 0,
     "application": {
       "token": "7tftdi4PJLqXhCmQtzcypqci",
-      "name": "Test Application",
+      "name": "This is name of the application",
       "created_at": "2022-06-29T12:22:03.000Z"
     }
   }
@@ -102,7 +102,7 @@ https://user-images.githubusercontent.com/57943026/176784778-b103703b-268b-4935-
 ```json
   {
     "number": 1,
-    "content": "string",
+    "content": "This is content of the message",
     "chat": {
       "number": 1,
       "created_at": "2022-06-29T12:22:03.000Z"
@@ -173,12 +173,12 @@ end
   - [Chats Spec](https://github.com/OmarAbdelSamea/chat-app/blob/master/spec/requests/chats_specs.rb)
   - [Messages](https://github.com/OmarAbdelSamea/chat-app/blob/master/spec/requests/chats_specs.rb)
 
-## 5. Writing RESTful endpoints in controllers which pass all test
+## 5. Writing RESTful endpoints in controllers which pass all tests
   - [Applications Controller](https://github.com/OmarAbdelSamea/chat-app/blob/master/app/controllers/applications_controller.rb)
   - [Chats Controller](https://github.com/OmarAbdelSamea/chat-app/blob/master/app/controllers/chats_controller.rb)
   - [Messages Controller](https://github.com/OmarAbdelSamea/chat-app/blob/master/app/controllers/messages_controller.rb)
 
-## 6. Check tests if it fails repeat cycle until all test pass
+## 6. Check tests if it fails repeat cycle until all tests pass
   
 ```ruby
 .................
@@ -188,13 +188,13 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
 
 ```
 
-## 7. After Getting familiar with Ruby on Rails stared containerization process of Rails app and MySQL Database
+## 7. After Getting familiar with Ruby on Rails, started containerization process of Rails app and MySQL Database
   - [Dockerfile](https://github.com/OmarAbdelSamea/chat-app/blob/master/Dockerfile)
   - [Docker-compose](https://github.com/OmarAbdelSamea/chat-app/blob/master/docker-compose.yml)
 
 ## 8. Adding search endpoint for messages using `elastic search`
   - Adding `ElasticSearch` in Message model
-  - Create search endpoint in Message controller
+  - Creating search endpoint in Messages controller
   - Response: search string: `Github`
   ```json
   [
@@ -221,12 +221,12 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
 
 ## 9.  Containerization of elasticsearch
 
-## 10. Handling of parallel processing and distribution by using queues
+## 10. Handling parallel processing and system distribution by using queues
   1. Analyzing options
     - Sidekiq
     - RabbitMQ
     - Kafka
-  2. Selecting the one of the options -> Sidekiq 
+  2. Selecting one of the options -> Sidekiq 
   3. Selecting an appropriate storage for workers -> Redis (Sidekiq default)
 
   ```ruby
@@ -271,19 +271,25 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
 ## 11.  Containerization of Sidekiq and Redis
 ## 12. Saving `chats_count` and `messages_count` in Redis instead of MySQL with each new record for higher performance 
 
-## 13. Adding pessimistic lock for Redis (redlock gem) to avoid race conditions while updating chats/messages count
-
+## 13. Adding pessimistic locks for Redis (redlock gem) to avoid race conditions while updating `chats_count` and `messages_count`
+  - Example from chats controller, same approach implemented in messages controller
   ```ruby
+  # lock the chat number in redis before incrementing the count
   @lock_result = $red_lock.lock("application_token:#{@application.token}/chats_count", 2000)
+  # if the lock is successful
   if @lock_result != false
+      # check if the chat count is present or not in redis
       if $redis.get("application_token:#{@application.token}/chats_count").present?
+          # get the chat count from redis and increment it by 1
           @count = $redis.get("application_token:#{@application.token}/chats_count").to_i + 1
-          increment_chats_count(@count)
+          # update the chat count in redis
+          update_chats_count(@count)
       else
           @count = @application.chats_count + 1
+          # if the chat count is not present in redis then set the chat count to 1
           $redis.set("application_token:#{@application.token}/chats_count", @count)
       end
-
+      # unlock the chat number
       $red_lock.unlock(@lock_result)
       return @count, @lock_result
   else
@@ -296,6 +302,7 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
   def perform(*args)
     message = args[0]
     message_params = args[1]
+    # pessimistic locking in MySQL database until the record is updated
     message.with_lock do
       message.update!(message_params)
     end
@@ -304,7 +311,7 @@ Finished in 2.01 seconds (files took 2.86 seconds to load)
 ## 15. Adding Cron Job to update `chats_count` and `messages_count` in MySQL from Redis
 ```ruby
 save_counts_persistent:
-  cron: "* * * * *" # this runs the job every minute for demo
+  cron: "* * * * *" # this runs the job every minute for demos
   # cron: "0 * * * *" this runs the job every hour
   class: "SaveCountsPersistentJob"
   queue: default
@@ -315,15 +322,21 @@ class SaveCountsPersistentJob < ApplicationJob
   queue_as :default
 
   def perform(*args)
+      # get all applications in MySQL database
     Application.find_each do |application|
+      # check if present in redis or not
       if $redis.get("application_token:#{application.token}/chats_count").present?
+        # if present then get the chat count from redis and update it in MySQL database
         application.chats_count = $redis.get("application_token:#{application.token}/chats_count").to_i
         application.save!
       end
     end
 
+    # get all chats in MySQL database
     Chat.find_each do |chat|
+      # check if present in redis or not
       if $redis.get("application_token:#{chat.application.token}/chat_number:#{chat.number}/messages_count").present?
+        # if present then get the message count from redis and update it in MySQL database
         chat.messages_count = $redis.get("application_token:#{chat.application.token}/chat_number:#{chat.number}/messages_count").to_i
         chat.save!
       end
