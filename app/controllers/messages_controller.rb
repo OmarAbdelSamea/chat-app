@@ -5,7 +5,7 @@ class MessagesController < ApplicationController
 
     # GET /applications/:application_token/chats/:chat_number/messages
     def index
-        json_response_messages(@chat.messages)
+        json_response_messages(@chat.messages.order(number: :asc))
     end
 
     # POST /applications/:application_token/chats/:chat_number/messages 

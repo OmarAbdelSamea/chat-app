@@ -4,7 +4,7 @@ class ChatsController < ApplicationController
 
     # GET /applications/:application_token/chats 
     def index
-        json_response_chats(@application.chats)
+        json_response_chats(@application.chats.order(number: :asc))
     end
 
     # POST /applications/:application_token/chats 
