@@ -172,7 +172,7 @@ end
 ## 4. Writing unit tests (specs) for Test Driven Development approach
   - [Applications Spec](https://github.com/OmarAbdelSamea/chat-app/blob/master/spec/requests/applications_spec.rb)
   - [Chats Spec](https://github.com/OmarAbdelSamea/chat-app/blob/master/spec/requests/chats_specs.rb)
-  - [Messages](https://github.com/OmarAbdelSamea/chat-app/blob/master/spec/requests/chats_specs.rb)
+  - [Messages Spec](https://github.com/OmarAbdelSamea/chat-app/blob/master/spec/requests/messages_specs.rb)
 
 ## 5. Writing RESTful endpoints in controllers which pass all tests
   - [Applications Controller](https://github.com/OmarAbdelSamea/chat-app/blob/master/app/controllers/applications_controller.rb)
@@ -346,4 +346,4 @@ class SaveCountsPersistentJob < ApplicationJob
 end
 ```
 ## 16. Writing RESTful API compliant to openapi standard
-[Openapi.yaml](https://github.com/OmarAbdelSamea/chat-app/blob/master/openapi.yml)
+[openapi.yaml](https://github.com/OmarAbdelSamea/chat-app/blob/master/openapi.yaml)
